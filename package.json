@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "btoa": "^1.1.2",
     "meshblu-db": "^1.2.1",
     "oauth2orize": "^1.0.1"
   },
