@@ -1,0 +1,30 @@
+{
+  "name": "octoblu-oauth-provider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "meshblu-db": "^1.2.1",
+    "oauth2orize": "^1.0.1"
+  },
+  "devDependencies": {
+    "chai": "^2.1.2",
+    "coffee-script": "^1.9.1",
+    "mocha": "^2.2.1",
+    "sinon": "^1.14.1",
+    "sinon-chai": "^2.7.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/octoblu/octoblu-oauth-provider.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/octoblu/octoblu-oauth-provider/issues"
+  },
+  "homepage": "https://github.com/octoblu/octoblu-oauth-provider"
+}
