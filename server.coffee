@@ -4,7 +4,7 @@ oauthserver = require 'oauth2-server'
 OctobluOauth = require './octoblu-oauth'
 
 OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL || 'https://app.octoblu.com'
-OCTOBLU_OAUTH_PROVIDER_PORT = process.env.OCTOBLU_OAUTH_PROVIDER_PORT || 9000
+OCTOBLU_OAUTH_PROVIDER_SERVER_PORT = process.env.OCTOBLU_OAUTH_PROVIDER_SERVER_PORT || 9000
 MESHBLU_HOST = process.env.MESHBLU_HOST
 MESHBLU_PORT = process.env.MESHBLU_PORT
 MESHBLU_PROTOCOL = process.env.MESHBLU_PROTOCOL
@@ -29,4 +29,4 @@ app.get '/auth_code', app.oauth.authCodeGrant (req, next) =>
 
 app.use app.oauth.errorHandler()
 
-app.listen OCTOBLU_OAUTH_PROVIDER_PORT
+app.listen OCTOBLU_OAUTH_PROVIDER_SERVER_PORT
