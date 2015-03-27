@@ -21,6 +21,9 @@ app.oauth = oauthserver
 
 app.all '/access_token', app.oauth.grant()
 
+app.get '/', (req, res) ->
+  res.send online: true
+
 app.get '/authorize', (req, res) ->
   res.redirect "#{OCTOBLU_BASE_URL}/oauth/#{req.query.client_id}?redirect=/auth_code&redirect_uri=#{req.query.redirect_uri}&response_type=#{req.query.response_type}"
 
