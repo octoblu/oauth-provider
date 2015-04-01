@@ -1,7 +1,7 @@
-id: octoblu-oauth-blue
+id: octoblu-oauth-green
 kind: Service
 apiVersion: v1beta1
-port: 9000
+port: 9001
 containerPort: 9000
 publicIPs:
   - 172.20.0.10
@@ -9,7 +9,7 @@ publicIPs:
   - 172.20.0.12
   - 172.20.0.13
 labels:
-  name: octoblu-oauth-provider-blue
+  name: octoblu-oauth-provider-green
   version: 1.0.0
 selector:
-  name: octoblu-oauth-provider-blue
+  name: octoblu-oauth-provider-green
