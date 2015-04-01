@@ -1,0 +1,27 @@
+id: docker-builder
+kind: Pod
+apiVersion: v1beta1
+labels:
+  name: $TRAVIS_REPO_SLUG
+  version: $TRAVIS_COMMIT
+desiredState:
+  manifest:
+    version: v1beta1
+    id: docker-builder
+    restartPolicy:
+      never: {}
+    containers:
+      - name: docker-builder
+        image: tumtum/builder
+        privileged: true
+        env:
+          - name: GIT_REPO
+            value: https://github.com/$TRAVIS_REPO_SLUG.git
+          - name: GIT_TAG
+            value: $TRAVIS_COMMIT
+          - name: IMAGE_NAME
+            value: $TRAVIS_REPO_SLUG:$TRAVIS_COMMIT
+          - name: USERNAME
+            value: $DOCKER_USERNAME
+          - name: PASSWORD
+            value: $DOCKER_PASSWORD

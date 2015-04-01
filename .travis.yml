@@ -10,9 +10,11 @@ env:
   global:
     - REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg'
 after_success:
-- mkdir -p dpl_cd_upload
-- perl -pe $REPLACE_REGEX .kubernetes/appspec.yml.tmpl > appspec.yml
-- zip -r dpl_cd_upload/octoblu-oauth-provider-$TRAVIS_COMMIT.zip * .kubernetes
+- mkdir -p dpl_cd_upload/docker-builder dpl_cd_upload/octoblu-oauth-provider
+- perl -pe $REPLACE_REGEX .kubernetes/octoblu-oauth-provider/appspec.yml.tmpl > .kubernetes/octoblu-oauth-provider/appspec.yml
+- perl -pe $REPLACE_REGEX .kubernetes/docker-builder/appspec.yml.tmpl > .kubernetes/docker-builder/appspec.yml
+- zip -r dpl_cd_upload/octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip .kubernetes/deploy/*
+- zip -r dpl_cd_upload/docker-builder/octoblu-oauth-provider-$TRAVIS_COMMIT.zip .kubernetes/docker-builder/*
 deploy:
 - provider: s3
   access_key_id: AKIAIT4X4NDGM2WVL6VA
@@ -21,17 +23,16 @@ deploy:
   local_dir: dpl_cd_upload
   skip_cleanup: true
   bucket: octoblu-deploy
-  upload_dir: octoblu-oauth-provider
   on:
     branch: master
 - provider: codedeploy
   access_key_id: AKIAIT4X4NDGM2WVL6VA
   secret_access_key: *1
   bucket: octoblu-deploy
-  key: octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
+  key: octoblu-deploy/docker-builder/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
   bundle_type: zip
   region: us-west-2
-  application: octoblu-oauth-provider
-  deployment_group: master
+  application: docker-builder
+  deployment_group: octoblu-oauth-provider
   on:
     branch: master
