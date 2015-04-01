@@ -1,0 +1,37 @@
+language: node_js
+sudo: false
+cache:
+  bundler: true
+  directories:
+  - node_modules
+node_js:
+- '0.10'
+env:
+  global:
+    - REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg'
+after_success:
+- mkdir -p dpl_cd_upload
+- perl -pe $REPLACE_REGEX .kubernetes/appspec.yml.tmpl > appspec.yml
+- zip -r dpl_cd_upload/octoblu-oauth-provider-$TRAVIS_COMMIT.zip * .kubernetes
+deploy:
+- provider: s3
+  access_key_id: AKIAIT4X4NDGM2WVL6VA
+  secret_access_key: &1
+    secure: KnNa7ps3GiP1HumgpK+9Io3R34/iU+BgAqM1tKyMaGD+XMU8Vv74UGFvWiZmTpCTI2LRQxEq63XjNey8zzzWApBkTHwrmhzHQNZu7niGTm2xq38LYcut9gQsKlre0UAE5e9LSP885A4ZZICb6+EyoLo71zpiXc7Lbvq+P2ZYjpE=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  bucket: octoblu-deploy
+  upload_dir: octoblu-oauth-provider
+  on:
+    branch: master
+- provider: codedeploy
+  access_key_id: AKIAIT4X4NDGM2WVL6VA
+  secret_access_key: *1
+  bucket: octoblu-deploy
+  key: octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
+  bundle_type: zip
+  region: us-west-2
+  application: octoblu-oauth-provider
+  deployment_group: master
+  on:
+    branch: master

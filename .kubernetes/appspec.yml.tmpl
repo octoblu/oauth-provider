@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /deploy/meshblu-blink1/$TRAVIS_COMMIT
+hooks:
+  ApplicationStart:
+    - location: .kubernetes/application_start
+  ApplicationStop:
+    - location: .kubernetes/application_stop

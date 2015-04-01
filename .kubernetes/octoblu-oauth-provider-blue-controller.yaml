@@ -1,0 +1,26 @@
+id: octoblu-oauth-provider-blue-controller
+kind: ReplicationController
+apiVersion: v1beta1
+labels:
+  name: octoblu-oauth-provider-blue
+  version: 1.0.0
+desiredState:
+  replicas: 2
+  replicaSelector:
+    name: octoblu-oauth-provider-blue
+    version: 1.0.0
+  podTemplate:
+    labels:
+      name: octoblu-oauth-provider-blue
+      app: octoblu-oauth-provider-blue
+      version: 1.0.0
+    desiredState:
+      manifest:
+        version: v1beta1
+        id: octoblu-oauth-provider-blue
+        containers:
+          - name: octoblu-oauth-provider-blue
+            image: octoblu/octoblu-oauth-provider
+            ports:
+              - containerPort: 9000
+

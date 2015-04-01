@@ -1,0 +1,6 @@
+#!/bin/bash
+
+SCRIPT_DIR=`dirname $0`
+DISTRIBUTION_DIR=`dirname $SCRIPT_DIR`
+
+kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-blue-controller.yaml
