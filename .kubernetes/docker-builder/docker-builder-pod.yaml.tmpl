@@ -1,17 +1,17 @@
-id: docker-builder
+id: docker-builder-$SHORT_COMMIT
 kind: Pod
 apiVersion: v1beta1
 labels:
   name: build
-  version: $TRAVIS_COMMIT
+  version: $SHORT_COMMIT
 desiredState:
   manifest:
     version: v1beta1
-    id: docker-builder
+    id: docker-builder-$SHORT_COMMIT
     restartPolicy:
       never: {}
     containers:
-      - name: docker-builder
+      - name: docker-builder-$SHORT_COMMIT
         image: tumtum/builder
         privileged: true
         env:
@@ -20,7 +20,7 @@ desiredState:
           - name: GIT_TAG
             value: $TRAVIS_COMMIT
           - name: IMAGE_NAME
-            value: $TRAVIS_REPO_SLUG:$TRAVIS_COMMIT
+            value: $TRAVIS_REPO_SLUG:$SHORT_COMMIT
           - name: USERNAME
             value: $DOCKER_USERNAME
           - name: PASSWORD

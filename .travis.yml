@@ -10,6 +10,7 @@ env:
   global:
   - REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg'
   - DOCKER_USERNAME=octoblu
+  - SHORT_COMMIT=${TRAVIS_COMMIT:0:7}
   - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
 after_success:
 - mkdir -p dpl_cd_upload/docker-builder dpl_cd_upload/octoblu-oauth-provider
