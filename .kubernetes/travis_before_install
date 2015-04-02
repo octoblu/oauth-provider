@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+export SHORT_COMMIT=${TRAVIS_COMMIT:0:7}
+export DOCKER_LABEL_NAME=`echo $TRAVIS_REPO_SLUG | sed 's/\//\./g'`
