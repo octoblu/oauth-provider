@@ -2,7 +2,7 @@ id: docker-builder
 kind: Pod
 apiVersion: v1beta1
 labels:
-  name: $TRAVIS_REPO_SLUG
+  name: build
   version: $TRAVIS_COMMIT
 desiredState:
   manifest:
