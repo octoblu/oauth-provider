@@ -15,7 +15,9 @@ env:
   - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
 after_success:
 - mkdir -p dpl_cd_upload/docker-builder dpl_cd_upload/octoblu-oauth-provider
-- perl -pe $REPLACE_REGEX .kubernetes/octoblu-oauth-provider/appspec.yml.tmpl > .kubernetes/octoblu-oauth-provider/appspec.yml
+- perl -pe $REPLACE_REGEX .kubernetes/deploy/appspec.yml.tmpl > .kubernetes/octoblu-oauth-provider/appspec.yml
+- perl -pe $REPLACE_REGEX .kubernetes/deploy/octoblu-oauth-provider-blue-controller.yaml.tmpl > .kubernetes/octoblu-oauth-provider/octoblu-oauth-provider-blue-controller.yaml
+- perl -pe $REPLACE_REGEX .kubernetes/deploy/octoblu-oauth-provider-green-controller.yaml.tmpl > .kubernetes/octoblu-oauth-provider/octoblu-oauth-provider-green-controller.yaml
 - perl -pe $REPLACE_REGEX .kubernetes/docker-builder/appspec.yml.tmpl > .kubernetes/docker-builder/appspec.yml
 - perl -pe $REPLACE_REGEX .kubernetes/docker-builder/docker-builder-pod.yaml.tmpl
   > .kubernetes/docker-builder/docker-builder-pod.yaml

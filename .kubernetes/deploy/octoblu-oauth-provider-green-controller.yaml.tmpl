@@ -3,24 +3,24 @@ kind: ReplicationController
 apiVersion: v1beta1
 labels:
   name: octoblu-oauth-provider-green
-  version: 1.0.0
+  version: $SHORT_COMMIT
 desiredState:
   replicas: 2
   replicaSelector:
     name: octoblu-oauth-provider-green
-    version: 1.0.0
+    version: $SHORT_COMMIT
   podTemplate:
     labels:
       name: octoblu-oauth-provider-green
       app: octoblu-oauth-provider-green
-      version: 1.0.0
+      version: $SHORT_COMMIT
     desiredState:
       manifest:
         version: v1beta1
         id: octoblu-oauth-provider-green
         containers:
           - name: octoblu-oauth-provider-green
-            image: octoblu/octoblu-oauth-provider
+            image: octoblu/octoblu-oauth-provider:$SHORT_COMMIT
             ports:
               - containerPort: 9000
 
