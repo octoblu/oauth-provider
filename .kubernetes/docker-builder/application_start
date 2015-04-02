@@ -1,7 +1,5 @@
 #!/bin/bash
 
 SCRIPT_DIR=`dirname $0`
-DISTRIBUTION_DIR=`dirname $SCRIPT_DIR`
 
-kubectl delete pod -lname=meshblu-blink1
-kubectl create -f $SCRIPT_DIR/docker-build-pod.yaml
+kubectl create -f $SCRIPT_DIR/docker-builder-pod.yaml
