@@ -2,7 +2,7 @@ id: docker-builder-$SHORT_COMMIT
 kind: Pod
 apiVersion: v1beta1
 labels:
-  name: build
+  name: $DOCKER_LABEL_NAME
   version: $SHORT_COMMIT
 desiredState:
   manifest:
