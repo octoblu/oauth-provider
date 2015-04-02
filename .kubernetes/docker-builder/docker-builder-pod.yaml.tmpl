@@ -12,7 +12,7 @@ desiredState:
       never: {}
     containers:
       - name: docker-builder-$SHORT_COMMIT
-        image: tutum/builder
+        image: octoblu/did-codedeploy
         privileged: true
         env:
           - name: GIT_REPO
@@ -25,3 +25,17 @@ desiredState:
             value: $DOCKER_USERNAME
           - name: PASSWORD
             value: $DOCKER_PASSWORD
+          - name: DEPLOY_APPLICATION_NAME
+            value: $DEPLOY_APPLICATION_NAME
+          - name: DEPLOY_REGION
+            value: $DEPLOY_REGION
+          - name: DEPLOYMENT_GROUP
+            value: $DEPLOYMENT_GROUP
+          - name: DEPLOY_BUCKET
+            value: $DEPLOY_BUCKET
+          - name: DEPLOY_KEY
+            value: $DEPLOY_KEY
+          - name: AWS_ACCESS_KEY_ID
+            value: $AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            value: $AWS_SECRET_ACCESS_KEY

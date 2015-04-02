@@ -8,10 +8,17 @@ node_js:
 - '0.10'
 env:
   global:
+  - AWS_ACCESS_KEY_ID=AKIAIT4X4NDGM2WVL6VA
   - DOCKER_USERNAME=octoblu
+  - DEPLOY_APPLICATION_NAME=octoblu-oauth-provider
+  - DEPLOY_REGION=us-west-2
+  - DEPLOY_BUCKET=octoblu-deploy
+  - DEPLOYMENT_GROUP=master
+  - DEPLOY_KEY=octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
   - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
+  - secure: vBtdSV5OMB/2Jx4vQdx4W5Upq8yKo5y9mspd7r1RIGWnfD32kKgiLxQP9Xz4K2mSRGTBql+ukk7W3G2S5r6Qma0sp/vwVYMb5/6sNVZLtUxSFcMAQrZQUul7RF6tqjAwLttLP8D68eGhAFbvufWt/z1J9ero60D6fWptsfRypkE=
 after_success:
-  - .kubernetes/travis_after_success
+- .kubernetes/travis_after_success
 deploy:
 - provider: s3
   access_key_id: AKIAIT4X4NDGM2WVL6VA
