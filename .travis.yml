@@ -8,11 +8,8 @@ node_js:
 - '0.10'
 env:
   global:
-  - SHORT_COMMIT=${TRAVIS_COMMIT:0:7}
   - DOCKER_USERNAME=octoblu
   - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
-before_install:
-  - export DOCKER_LABEL_NAME=`echo $TRAVIS_REPO_SLUG | sed 's/\//\./g'`
 after_success:
   - .kubernetes/travis_after_success
 deploy:
