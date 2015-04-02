@@ -3,17 +3,17 @@ kind: ReplicationController
 apiVersion: v1beta1
 labels:
   name: octoblu-oauth-provider-green
-  version: $SHORT_COMMIT
+  version: "$SHORT_COMMIT"
 desiredState:
   replicas: 2
   replicaSelector:
     name: octoblu-oauth-provider-green
-    version: $SHORT_COMMIT
+    version: "$SHORT_COMMIT"
   podTemplate:
     labels:
       name: octoblu-oauth-provider-green
       app: octoblu-oauth-provider-green
-      version: $SHORT_COMMIT
+      version: "$SHORT_COMMIT"
     desiredState:
       manifest:
         version: v1beta1

@@ -23,6 +23,9 @@ kubectl delete pods -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl delete rc -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-controller.yaml
 
+
+sleep 30
+
 AWS_DEFAULT_REGION=us-west-2 /usr/bin/aws elb delete-load-balancer-listeners --load-balancer-name oauth-octoblu-com --load-balancer-ports 80
 AWS_DEFAULT_REGION=us-west-2 /usr/bin/aws elb delete-load-balancer-listeners --load-balancer-name oauth-octoblu-com --load-balancer-ports 443
 AWS_DEFAULT_REGION=us-west-2 /usr/bin/aws elb create-load-balancer-listeners --load-balancer-name oauth-octoblu-com --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=${NEW_PORT}
