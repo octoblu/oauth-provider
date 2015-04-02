@@ -8,13 +8,18 @@ node_js:
 - '0.10'
 env:
   global:
-    - REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg'
+  - REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg'
+  - DOCKER_USERNAME=octoblu
+  - SHORT_COMMIT=${TRAVIS_COMMIT:0:7}
+  - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
 after_success:
 - mkdir -p dpl_cd_upload/docker-builder dpl_cd_upload/octoblu-oauth-provider
 - perl -pe $REPLACE_REGEX .kubernetes/octoblu-oauth-provider/appspec.yml.tmpl > .kubernetes/octoblu-oauth-provider/appspec.yml
 - perl -pe $REPLACE_REGEX .kubernetes/docker-builder/appspec.yml.tmpl > .kubernetes/docker-builder/appspec.yml
-- perl -pe $REPLACE_REGEX .kubernetes/docker-builder/docker-builder-pod.yaml.tmpl > .kubernetes/docker-builder/docker-builder-pod.yaml
-- zip -jr dpl_cd_upload/octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip .kubernetes/deploy/*
+- perl -pe $REPLACE_REGEX .kubernetes/docker-builder/docker-builder-pod.yaml.tmpl
+  > .kubernetes/docker-builder/docker-builder-pod.yaml
+- zip -jr dpl_cd_upload/octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
+  .kubernetes/deploy/*
 - zip -jr dpl_cd_upload/docker-builder/octoblu-oauth-provider-$TRAVIS_COMMIT.zip .kubernetes/docker-builder/*
 deploy:
 - provider: s3
