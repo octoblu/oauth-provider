@@ -3,7 +3,7 @@ kind: Pod
 apiVersion: v1beta1
 labels:
   name: $DOCKER_LABEL_NAME
-  version: $SHORT_COMMIT
+  version: "$SHORT_COMMIT"
 desiredState:
   manifest:
     version: v1beta1
