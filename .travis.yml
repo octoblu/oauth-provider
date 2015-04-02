@@ -29,7 +29,7 @@ deploy:
   access_key_id: AKIAIT4X4NDGM2WVL6VA
   secret_access_key: *1
   bucket: octoblu-deploy
-  key: octoblu-deploy/docker-builder/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
+  key: docker-builder/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
   bundle_type: zip
   region: us-west-2
   application: docker-builder
