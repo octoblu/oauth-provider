@@ -12,7 +12,7 @@ desiredState:
       never: {}
     containers:
       - name: docker-builder-$SHORT_COMMIT
-        image: octoblu/did-codedeploy
+        image: octoblu/dind-codedeploy
         privileged: true
         env:
           - name: GIT_REPO
