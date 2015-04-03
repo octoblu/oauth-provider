@@ -21,7 +21,7 @@ app.oauth = oauthserver
 
 app.all '/access_token', app.oauth.grant()
 
-app.get '/', (req, res) ->
+app.get '/healthcheck', (req, res) ->
   res.send online: true
 
 app.get '/authorize', (req, res) ->
