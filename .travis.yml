@@ -15,15 +15,15 @@ env:
   - DEPLOY_BUCKET=octoblu-deploy
   - DEPLOYMENT_GROUP=master
   - DEPLOY_KEY=octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
-  - secure: mDfKQegPytLfFaobY+kaSVM1/8qxAaKu06wKDgaSqYZWKUoT+1hBJtmmZcmJMMXeOoEnNC47Fz2DXmyEKX8UQb03bTWs61TV4hCZDTQou+dnEFRnc+m1e38WPaXVD7WpcmZWncqzJNuxns7hCL+YkSBRDb8eF9KGQ1sgqzYUcbY=
-  - secure: vBtdSV5OMB/2Jx4vQdx4W5Upq8yKo5y9mspd7r1RIGWnfD32kKgiLxQP9Xz4K2mSRGTBql+ukk7W3G2S5r6Qma0sp/vwVYMb5/6sNVZLtUxSFcMAQrZQUul7RF6tqjAwLttLP8D68eGhAFbvufWt/z1J9ero60D6fWptsfRypkE=
+  - secure: yUG5O4e1zlh3lsU5Y84zOXLWxkIr0PJNyaCHdcniPlOQJ2muMMsLT85cXMmelhhTy0BGxsNU+fV2xn4RIaUNogJwt6pn4iSuNAQTzBqMNU4qohnf/niUfGmn2MiJ/FuwEBZmNh5PwUuvdtRjzP2FjJC+SCK3m/rb5csvQsBQ6QM=
+  - secure: i4QNeYl8ScrL14VtYGzM1nfy4OS5b5hr9ungAfKp0DXU3+29Rtr2r70KNwlvowEBH070qJTypfuKU40oIzZDsaOy45/EegVdKQdG/1okvHWWkZDD2dUOk52sYaysa5+FlGFqRAL7hUNDEjkoxbpKwE3g7rVLAw4iDiPqDh6rXHo=
 after_success:
 - .kubernetes/travis_after_success
 deploy:
 - provider: s3
   access_key_id: AKIAIT4X4NDGM2WVL6VA
   secret_access_key: &1
-    secure: KnNa7ps3GiP1HumgpK+9Io3R34/iU+BgAqM1tKyMaGD+XMU8Vv74UGFvWiZmTpCTI2LRQxEq63XjNey8zzzWApBkTHwrmhzHQNZu7niGTm2xq38LYcut9gQsKlre0UAE5e9LSP885A4ZZICb6+EyoLo71zpiXc7Lbvq+P2ZYjpE=
+    secure: kxW3HRaVMIqX5ZY/POsaKGjqNptsgYDtuPQiNdJ24jkvRDnjHNwpxfh2bzUbGKyZZyofXWaBYDNc3AviyYImjT+vdeeQePYkfS10sfCKb5ePln8uvhs8aKhaapeWm5PeBDrvY3URvsJef1o55uO2gflk56b33G1gA1kysNPo/tY=
   local_dir: dpl_cd_upload
   skip_cleanup: true
   bucket: octoblu-deploy
