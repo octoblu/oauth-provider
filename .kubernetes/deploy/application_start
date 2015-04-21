@@ -27,6 +27,7 @@ kubectl delete -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-service.yaml
 kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-service.yaml
 
 # Restart the off Replica Controllers & Pods
+kubectl stop rc -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl delete rc -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl delete pods -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-controller.yaml
