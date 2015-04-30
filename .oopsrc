@@ -1,0 +1,6 @@
+{
+  "elb-name": "oauth-octoblu-com",
+  "application-name": "octoblu-oauth-provider",
+  "deployment-group": "master",
+  "s3-bucket": "octoblu-deploy"
+}
