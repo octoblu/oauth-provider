@@ -8,7 +8,6 @@ OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL || 'https://app.octoblu.com'
 OCTOBLU_OAUTH_PROVIDER_SERVER_PORT = process.env.OCTOBLU_OAUTH_PROVIDER_SERVER_PORT || 9000
 MESHBLU_HOST = process.env.MESHBLU_HOST
 MESHBLU_PORT = process.env.MESHBLU_PORT
-MESHBLU_PROTOCOL = process.env.MESHBLU_PROTOCOL
 
 app = express()
 
@@ -17,7 +16,7 @@ app.use bodyParser.json()
 app.use meshbluHealthcheck()
 
 app.oauth = oauthserver
-  model: new OctobluOauth {server: MESHBLU_HOST, port: MESHBLU_PORT, protocol: MESHBLU_PROTOCOL}
+  model: new OctobluOauth {server: MESHBLU_HOST, port: MESHBLU_PORT}
   grants: [ 'authorization_code', 'client_credentials' ]
   debug: true
 

@@ -1,16 +1,17 @@
 btoa = require 'btoa'
 atob = require 'atob'
 _ = require 'lodash'
+debug = require('debug')('octoblu-oauth:octoblu-oauth')
 
 class OctobluOauth
   constructor: (@meshbluOptions={}, dependencies={}) ->
-    @Meshblu = dependencies.Meshblu ? require './meshblu'
-
+    @Meshblu = dependencies.Meshblu ? require 'meshblu-http'
 
   getClient : (clientId, clientSecret, callback) =>
     meshblu = new @Meshblu _.extend({}, uuid: clientId, token: clientSecret, @meshbluOptions)
     meshblu.device clientId, (error, device) =>
       return callback error if error?
+      debug 'getClient', device
       callback null, client_id: clientId, client_secret: clientSecret, redirectUri: device.options?.callbackUrl
 
   grantTypeAllowed : (clientId, grantType, callback) =>
@@ -21,6 +22,7 @@ class OctobluOauth
 
   getAuthCode: (authCode, callback) =>
     token = atob(authCode).split ':'
+    debug 'getAuthCode', token
     callback null, {
       clientId: token[0]
       expires: new Date() + 10000
@@ -29,11 +31,13 @@ class OctobluOauth
 
   generateToken: (type, req, callback) =>
     params = _.extend {}, req.query, req.body
+    debug 'generateToken', params
     if type == 'authorization_code'
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
     token = atob(params.code).split ':'
     meshblu = new @Meshblu _.extend({}, uuid: token[1], token: token[2], @meshbluOptions)
+    debug 'generateToken', token[1], token[2]
     meshblu.generateAndStoreToken token[1], (error, response) =>
       newToken = response.token
       meshblu.revokeToken token[1], token[2]
