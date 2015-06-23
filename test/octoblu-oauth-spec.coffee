@@ -4,7 +4,7 @@ btoa = require 'btoa'
 describe 'OctobluOauth', ->
   beforeEach ->
     @meshblu = generateAccessToken: sinon.stub()
-    @Meshblu = sinon.stub().returns @meshblu
+    @MeshbluHttp = sinon.stub().returns @meshblu
 
     @meshbluJSON =
       uuid: 'head'
@@ -12,10 +12,9 @@ describe 'OctobluOauth', ->
       server: 'https://meshblu.octoblu.com'
       port: 443
 
-    @dependencies = Meshblu: @Meshblu
+    @dependencies = MeshbluHttp: @MeshbluHttp
     @sut = new OctobluOauth @meshbluJSON, @dependencies
 
   describe 'constructor', ->
     it 'should instantiate a OctobluOauth', ->
       expect(@sut).to.exist
-

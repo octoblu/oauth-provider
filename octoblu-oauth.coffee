@@ -5,10 +5,16 @@ debug = require('debug')('octoblu-oauth:octoblu-oauth')
 
 class OctobluOauth
   constructor: (@meshbluOptions={}, dependencies={}) ->
-    @Meshblu = dependencies.Meshblu ? require 'meshblu-http'
+    @MeshbluHttp = dependencies.MeshbluHttp ? require 'meshblu-http'
 
   getClient : (clientId, clientSecret, callback) =>
-    meshblu = new @Meshblu _.extend({}, uuid: clientId, token: clientSecret, @meshbluOptions)
+    options = _.cloneDeep @meshbluOptions
+    if clientSecret
+      options.uuid = clientId
+      options.token = clientSecret
+
+    meshblu = new @MeshbluHttp options
+    debug 'getClient: about to get device', clientId, clientSecret
     meshblu.device clientId, (error, device) =>
       return callback error if error?
       debug 'getClient', device
@@ -36,7 +42,7 @@ class OctobluOauth
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
     token = atob(params.code).split ':'
-    meshblu = new @Meshblu _.extend({}, uuid: token[1], token: token[2], @meshbluOptions)
+    meshblu = new @MeshbluHttp _.extend({}, uuid: token[1], token: token[2], @meshbluOptions)
     debug 'generateToken', token[1], token[2]
     meshblu.generateAndStoreToken token[1], (error, response) =>
       newToken = response.token

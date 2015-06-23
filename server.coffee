@@ -2,12 +2,13 @@ express = require 'express'
 bodyParser = require 'body-parser'
 oauthserver = require 'oauth2-server'
 OctobluOauth = require './octoblu-oauth'
+MeshbluConfig = require 'meshblu-config'
+
+meshbluConfig = new MeshbluConfig().toJSON()
 meshbluHealthcheck = require 'express-meshblu-healthcheck'
 
 OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL || 'https://app.octoblu.com'
-OCTOBLU_OAUTH_PROVIDER_SERVER_PORT = process.env.OCTOBLU_OAUTH_PROVIDER_SERVER_PORT || 9000
-MESHBLU_HOST = process.env.MESHBLU_HOST
-MESHBLU_PORT = process.env.MESHBLU_PORT
+PORT = process.env.PORT || 80
 
 app = express()
 
@@ -16,7 +17,7 @@ app.use bodyParser.json()
 app.use meshbluHealthcheck()
 
 app.oauth = oauthserver
-  model: new OctobluOauth {server: MESHBLU_HOST, port: MESHBLU_PORT}
+  model: new OctobluOauth meshbluConfig
   grants: [ 'authorization_code', 'client_credentials' ]
   debug: true
 
@@ -30,4 +31,4 @@ app.get '/auth_code', app.oauth.authCodeGrant (req, next) =>
 
 app.use app.oauth.errorHandler()
 
-app.listen OCTOBLU_OAUTH_PROVIDER_SERVER_PORT
+app.listen PORT
