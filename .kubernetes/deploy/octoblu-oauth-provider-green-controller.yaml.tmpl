@@ -23,3 +23,10 @@ desiredState:
             image: octoblu/octoblu-oauth-provider:$SHORT_COMMIT
             ports:
               - containerPort: 80
+            env:
+              - name: MESHBLU_UUID
+                value: $MESHBLU_UUID
+              - name: MESHBLU_TOKEN
+                value: $MESHBLU_TOKEN
+              - name: NODE_ENV
+                value: "production"

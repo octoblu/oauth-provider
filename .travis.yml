@@ -15,9 +15,11 @@ env:
   - DEPLOY_BUCKET=octoblu-deploy
   - DEPLOYMENT_GROUP=master
   - DEPLOY_KEY=octoblu-oauth-provider/octoblu-oauth-provider-$TRAVIS_COMMIT.zip
+  - MESHBLU_UUID=d7347c51-b111-4975-a72f-9f74881725ad
   - secure: i4QNeYl8ScrL14VtYGzM1nfy4OS5b5hr9ungAfKp0DXU3+29Rtr2r70KNwlvowEBH070qJTypfuKU40oIzZDsaOy45/EegVdKQdG/1okvHWWkZDD2dUOk52sYaysa5+FlGFqRAL7hUNDEjkoxbpKwE3g7rVLAw4iDiPqDh6rXHo=
   - secure: YHe7P4DsVk2F4IFQ47R+0+93IyHi4S7vf6Htd1eJHvwDzIUbmaSLDPtH7w4dknvIDIG03O7MGg8SROhIBeS6mX+3KdYUv0MHA7TdWhZh1BJOlkM+iupjTIQ3a+Cq3OChgBkPzoBYgZYcYkUx2zkKaw86Zkp/zBH4XMZFooUpHVo=
   - secure: nFdbJHtrp73hMW1GBPOzkVZVNYtI28XsPrr9tRLpRw+1hDAOd3Lv8WZrmrxi8uxTDxf316GhlbUmcp4eCQvWKRF8HYtvHlxAMKc+K45gKCCjVDYW5WxPNgN214hy3ziFqgyXn9yA+KEv+GId0a1eIGGaD/p/a8fDjlNoE52n0ZY=
+  - secure: Wz+1LRUsdbAzr501Fa4cYtr1m6dsJnLHHTlC1WW3LmQ5pkSd2hiWsMxkAXVQZ95y6QSQcRAtsmom15l5vmuvKuU5aU01/zcs2lPWnP2iWKZ6jJSN2vjTToWY2ycQmZAsDWv+Ne9elcDIs+iaS7MQKA+hRgVSP56JBFlORm3nbSA=
 after_success:
 - .kubernetes/travis_after_success
 deploy:
