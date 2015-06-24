@@ -17,7 +17,7 @@ class OctobluOauth
     debug 'getClient: about to get device', clientId, clientSecret
     meshblu.device clientId, (error, device) =>
       return callback error if error?
-      debug 'getClient', device
+      debug 'getClient found device', device
       callback null, client_id: clientId, client_secret: clientSecret, redirectUri: device.options?.callbackUrl
 
   grantTypeAllowed : (clientId, grantType, callback) =>
@@ -37,7 +37,7 @@ class OctobluOauth
 
   generateToken: (type, req, callback) =>
     params = _.extend {}, req.query, req.body
-    debug 'generateToken', params
+    debug 'generateToken', type, params
     if type == 'authorization_code'
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
