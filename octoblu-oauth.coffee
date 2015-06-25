@@ -45,7 +45,9 @@ class OctobluOauth
     meshblu = new @MeshbluHttp _.extend({}, uuid: token[1], token: token[2], @meshbluOptions)
     debug 'generateToken', token[1], token[2]
     meshblu.generateAndStoreToken token[1], (error, response) =>
+      debug 'generateAndStoreToken response', response
       newToken = response.token
+      debug 'generateAndStoreToken', token[1], newToken
       meshblu.revokeToken token[1], token[2]
       callback null, btoa token[1] + ':' + newToken
 
