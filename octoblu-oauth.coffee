@@ -37,8 +37,9 @@ class OctobluOauth
 
   generateToken: (type, req, callback) =>
     params = _.extend {}, req.query, req.body
-    debug 'generateToken', type, params
+    debug 'generateToken check type', type, params
     if type == 'authorization_code'
+      debug 'sending authorization_code', btoa params.client_id + ':' + params.uuid + ':' + params.token
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
     token = atob(params.code).split ':'
