@@ -14,7 +14,7 @@
     "lodash": "^3.6.0",
     "meshblu-config": "^2.0.0",
     "meshblu-db": "^1.2.1",
-    "meshblu-http": "^2.3.0",
+    "meshblu-http": "^3.0.0",
     "oauth2-server": "^2.4.0",
     "request": "^2.54.0"
   },

@@ -17,7 +17,7 @@ class OctobluOauth
     debug 'getClient: about to get device', clientId, clientSecret
     meshblu.device clientId, (error, device) =>
       return callback error if error?
-      debug 'getClient found device', device
+      debug 'getClient found device', device?.uuid
       callback null, client_id: clientId, client_secret: clientSecret, redirectUri: device.options?.callbackUrl
 
   grantTypeAllowed : (clientId, grantType, callback) =>
@@ -43,10 +43,13 @@ class OctobluOauth
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
     token = atob(params.code).split ':'
-    meshblu = new @MeshbluHttp _.extend({}, uuid: token[1], token: token[2], @meshbluOptions)
-    debug 'generateToken', token[1], token[2]
+    debug 'generateToken, split', token
+    options = _.extend({}, @meshbluOptions, uuid: token[1], token: token[2])
+    meshblu = new @MeshbluHttp options
+    debug 'generateToken', options
     meshblu.generateAndStoreToken token[1], (error, response) =>
-      debug 'generateAndStoreToken response', response
+      debug 'generateAndStoreToken error: ', error if error?
+      callback error if error?
       newToken = response.token
       debug 'generateAndStoreToken', token[1], newToken
       meshblu.revokeToken token[1], token[2]
