@@ -2,12 +2,13 @@
 
 SCRIPT_DIR=`dirname $0`
 DISTRIBUTION_DIR=`dirname $SCRIPT_DIR`
-PATH=/usr/local/bin:$PATH
 
-BLUE_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-tags --load-balancer-name oauth-octoblu-com | jq '.TagDescriptions[0].Tags[] | select(.Key == "blue") | .Value | tonumber'`
-GREEN_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-tags --load-balancer-name oauth-octoblu-com | jq '.TagDescriptions[0].Tags[] | select(.Key == "green") | .Value | tonumber'`
+export PATH=/usr/local/bin:$PATH
 
-OLD_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-load-balancers --load-balancer-name oauth-octoblu-com | jq '.LoadBalancerDescriptions[0].ListenerDescriptions[0].Listener.InstancePort'`
+BLUE_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-tags --load-balancer-name octoblu-oauth-provider | jq '.TagDescriptions[0].Tags[] | select(.Key == "blue") | .Value | tonumber'`
+GREEN_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-tags --load-balancer-name octoblu-oauth-provider | jq '.TagDescriptions[0].Tags[] | select(.Key == "green") | .Value | tonumber'`
+
+OLD_PORT=`AWS_DEFAULT_REGION=us-west-2 aws elb describe-load-balancers --load-balancer-name octoblu-oauth-provider | jq '.LoadBalancerDescriptions[0].ListenerDescriptions[0].Listener.InstancePort'`
 
 NEW_COLOR=blue
 NEW_PORT=${BLUE_PORT}
@@ -22,22 +23,30 @@ REPLACE_REGEX='s;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\}
 perl -pe $REPLACE_REGEX $SCRIPT_DIR/octoblu-oauth-provider-blue-service.yaml.tmpl > $SCRIPT_DIR/octoblu-oauth-provider-blue-service.yaml
 perl -pe $REPLACE_REGEX $SCRIPT_DIR/octoblu-oauth-provider-green-service.yaml.tmpl > $SCRIPT_DIR/octoblu-oauth-provider-green-service.yaml
 
-# Restart the off Service
 kubectl delete -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-service.yaml
 kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-service.yaml
 
-# Restart the off Replica Controllers & Pods
 kubectl stop rc -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl delete rc -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl delete pods -lname=octoblu-oauth-provider-${NEW_COLOR}
 kubectl create -f $SCRIPT_DIR/octoblu-oauth-provider-${NEW_COLOR}-controller.yaml
 
+x=0
+while [ "$x" -lt 20 -a -z "$KUBE_STATUS" ]; do
+   x=$((x+1))
+   sleep 10
+   echo "Checking kubectl status, attempt ${x}..."
+   KUBE_STATUS=`kubectl get pod -o json -lname=octoblu-oauth-provider-${NEW_COLOR} | jq ".items[].currentState.info[\"octoblu-oauth-provider-${NEW_COLOR}\"].ready" | uniq | grep true`
+done
 
-sleep 30
+if [ -z "$KUBE_STATUS" ]; then
+  echo "octoblu-oauth-provider-${NEW_COLOR} is not ready, giving up."
+  exit 1
+fi
 
-AWS_DEFAULT_REGION=us-west-2 aws elb delete-load-balancer-listeners --load-balancer-name oauth-octoblu-com --load-balancer-ports 80
-AWS_DEFAULT_REGION=us-west-2 aws elb delete-load-balancer-listeners --load-balancer-name oauth-octoblu-com --load-balancer-ports 443
-AWS_DEFAULT_REGION=us-west-2 aws elb create-load-balancer-listeners --load-balancer-name oauth-octoblu-com --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=${NEW_PORT}
-AWS_DEFAULT_REGION=us-west-2 aws elb create-load-balancer-listeners --load-balancer-name oauth-octoblu-com --listeners Protocol=HTTPS,LoadBalancerPort=443,InstanceProtocol=HTTP,InstancePort=${NEW_PORT},SSLCertificateId=arn:aws:iam::822069890720:server-certificate/startinter.octoblu.com
+AWS_DEFAULT_REGION=us-west-2 aws elb delete-load-balancer-listeners --load-balancer-name octoblu-oauth-provider --load-balancer-ports 80
+AWS_DEFAULT_REGION=us-west-2 aws elb delete-load-balancer-listeners --load-balancer-name octoblu-oauth-provider --load-balancer-ports 443
+AWS_DEFAULT_REGION=us-west-2 aws elb create-load-balancer-listeners --load-balancer-name octoblu-oauth-provider --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=${NEW_PORT}
+AWS_DEFAULT_REGION=us-west-2 aws elb create-load-balancer-listeners --load-balancer-name octoblu-oauth-provider --listeners Protocol=HTTPS,LoadBalancerPort=443,InstanceProtocol=HTTP,InstancePort=${NEW_PORT},SSLCertificateId=arn:aws:iam::822069890720:server-certificate/startinter.octoblu.com
 
-AWS_DEFAULT_REGION=us-west-2 aws elb configure-health-check --load-balancer-name oauth-octoblu-com --health-check Target=HTTP:${NEW_PORT}/healthcheck,Interval=30,Timeout=5,UnhealthyThreshold=2,HealthyThreshold=2
+AWS_DEFAULT_REGION=us-west-2 aws elb configure-health-check --load-balancer-name octoblu-oauth-provider --health-check Target=HTTP:${NEW_PORT}/healthcheck,Interval=30,Timeout=5,UnhealthyThreshold=2,HealthyThreshold=2
