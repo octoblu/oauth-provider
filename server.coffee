@@ -3,12 +3,18 @@ bodyParser = require 'body-parser'
 OAuth2Server = require 'oauth2-server'
 OctobluOauth = require './octoblu-oauth'
 MeshbluConfig = require 'meshblu-config'
+AuthCodeGrant = require './authCodeGrant'
 
 meshbluConfig = new MeshbluConfig().toJSON()
 meshbluHealthcheck = require 'express-meshblu-healthcheck'
 
 OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL || 'https://app.octoblu.com'
 PORT = process.env.PORT || 80
+
+OAuth2Server.prototype.authCodeGrant = (check) ->
+  that = @
+  (req, res, next) =>
+    new AuthCodeGrant that, req, res, next, check
 
 app = express()
 
@@ -20,27 +26,6 @@ app.oauth = OAuth2Server
   model: new OctobluOauth meshbluConfig
   grants: [ 'authorization_code', 'client_credentials' ]
   debug: true
-
-app.oauth.authCodeGrant.checkClient = (done) =>
-  @model.getClient @clientId, null, (err, client) ->
-    return done error('server_error', false, err) if err?
-    return done error('invalid_client', 'Invalid client credentials') unless client
-
-    if Array.isArray(client.redirectUri)
-      redirectUris = client.redirectUri
-    else
-      redirectUris = [client.redirectUri]
-
-    match = _.detect redirectUris, (uri) =>
-      _.startsWith @redirectUri, uri
-
-    return done error('invalid_request', 'redirect_uri does not match') unless match
-
-    # The request contains valid params so any errors after this point
-    # are redirected to the redirect_uri
-    self.res.oauthRedirect = true
-    self.client = client
-    done()
 
 app.all '/access_token', app.oauth.grant()
 
