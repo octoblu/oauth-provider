@@ -30,7 +30,7 @@ app.oauth = OAuth2Server
 app.all '/access_token', app.oauth.grant()
 
 app.get '/authorize', (req, res) ->
-  res.redirect "#{OCTOBLU_BASE_URL}/oauth/#{req.query.client_id}?redirect=/auth_code&redirect_uri=#{req.query.redirect_uri}&response_type=#{req.query.response_type}"
+  res.redirect "#{OCTOBLU_BASE_URL}/oauth/#{req.query.client_id}?redirect=#{encodeURIComponent("/auth_code")}&redirect_uri=#{encodeURIComponent(req.query.redirect_uri)}&response_type=#{encodeURIComponent(req.query.response_type)}"
 
 app.get '/auth_code', app.oauth.authCodeGrant (req, next) =>
   next null, true, req.params.uuid, null
