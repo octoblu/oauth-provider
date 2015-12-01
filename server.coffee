@@ -1,3 +1,5 @@
+cors = require 'cors'
+morgan = require 'morgan'
 express = require 'express'
 url = require 'url'
 bodyParser = require 'body-parser'
@@ -9,8 +11,8 @@ AuthCodeGrant = require './authCodeGrant'
 meshbluConfig = new MeshbluConfig().toJSON()
 meshbluHealthcheck = require 'express-meshblu-healthcheck'
 
-OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL || 'https://app.octoblu.com'
-PORT = process.env.PORT || 80
+OCTOBLU_BASE_URL = process.env.OCTOBLU_BASE_URL ? 'https://app.octoblu.com'
+PORT = process.env.PORT ? 80
 
 OAuth2Server.prototype.authCodeGrant = (check) ->
   that = @
@@ -18,7 +20,8 @@ OAuth2Server.prototype.authCodeGrant = (check) ->
     new AuthCodeGrant that, req, res, next, check
 
 app = express()
-
+app.use cors()
+app.use morgan('combined')
 app.use bodyParser.urlencoded extended: true
 app.use bodyParser.json()
 app.use meshbluHealthcheck()
@@ -29,7 +32,6 @@ app.oauth = OAuth2Server
   debug: true
 
 app.all '/access_token', app.oauth.grant()
-
 
 app.get '/authorize', (req, res) ->
   {protocol, hostname, port} = url.parse OCTOBLU_BASE_URL

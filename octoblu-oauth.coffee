@@ -1,7 +1,7 @@
 btoa = require 'btoa'
 atob = require 'atob'
 _ = require 'lodash'
-debug = require('debug')('octoblu-oauth:octoblu-oauth')
+debug = require('debug')('oauth-provider:octoblu-oauth')
 
 class OctobluOauth
   constructor: (@meshbluOptions={}, dependencies={}) ->

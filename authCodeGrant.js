@@ -16,7 +16,9 @@
 
 var error = require('oauth2-server/lib/error'),
   runner = require('oauth2-server/lib/runner'),
-  token = require('oauth2-server/lib/token');
+  token = require('oauth2-server/lib/token'),
+  url  = require('url'),
+  _ = require('lodash');
 
 module.exports = AuthCodeGrant;
 
@@ -200,8 +202,13 @@ function saveAuthCode (done) {
  * @this   OAuth
  */
 function redirect (done) {
-  this.res.redirect(this.client.redirectUri + '?code=' + this.authCode +
-      (this.req.query.state ? '&state=' + this.req.query.state : ''));
+  var uriObject = url.parse(this.client.redirectUri, true);
+  uriObject.query.code = this.authCode;
+  if (this.req.query.state){
+    uriObject.query.state = this.req.query.state;
+  }
+  var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query'));
+  this.res.redirect(uri);
 
   if (this.config.continueAfterResponse)
     return done();
