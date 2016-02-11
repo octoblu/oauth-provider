@@ -48,6 +48,7 @@ app.get '/authorize', (req, res) ->
       port: port
       pathname: "/oauth/#{clientId}"
       query:
+        state: req.query.state
         redirect: '/auth_code'
         redirect_uri: redirectUri
         response_type: req.query.response_type
