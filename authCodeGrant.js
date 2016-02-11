@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+var debug = require('debug')('oauth-provider:auth-code-grant');
 
 var error = require('oauth2-server/lib/error'),
   runner = require('oauth2-server/lib/runner'),
@@ -111,7 +112,7 @@ function checkClient (done) {
   var redirectUris;
 
   this.model.getClient(this.clientId, null, function (err, client) {
-    console.log('got client', client);
+    debug('got client', client);
     if (err) return done(error('server_error', false, err));
 
     if (!client) {
@@ -204,10 +205,12 @@ function saveAuthCode (done) {
 function redirect (done) {
   var uriObject = url.parse(this.client.redirectUri, true);
   uriObject.query.code = this.authCode;
+  debug('redirecting (req.query.state)', this.req.query.state);
   if (this.req.query.state){
     uriObject.query.state = this.req.query.state;
   }
   var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query'));
+  debug('Redirecting to URI', uri, uriObject);
   this.res.redirect(uri);
 
   if (this.config.continueAfterResponse)
