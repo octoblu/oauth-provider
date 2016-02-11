@@ -26,8 +26,9 @@ app.use bodyParser.urlencoded extended: true
 app.use bodyParser.json()
 app.use meshbluHealthcheck()
 
+octobluOauth = new OctobluOauth meshbluConfig
 app.oauth = OAuth2Server
-  model: new OctobluOauth meshbluConfig
+  model: octobluOauth
   grants: [ 'authorization_code', 'client_credentials' ]
   debug: true
 
@@ -35,19 +36,25 @@ app.all '/access_token', app.oauth.grant()
 
 app.get '/authorize', (req, res) ->
   {protocol, hostname, port} = url.parse OCTOBLU_BASE_URL
-  res.redirect url.format
-    protocol: protocol
-    hostname: hostname
-    port: port
-    pathname: "/oauth/#{req.query.client_id}"
-    query:
-      redirect: '/auth_code'
-      redirect_uri: req.query.redirect_uri
-      response_type: req.query.response_type
+  clientId = req.query.client_id
+  redirectUri = req.query.redirect_uri
+  octobluOauth.getClient clientId, null, (error, client)=>
+    return response.status(404).send error: error if error?
+    redirectUri ?= client.redirectUri
+    res.redirect url.format
+      protocol: protocol
+      hostname: hostname
+      port: port
+      pathname: "/oauth/#{clientId}"
+      query:
+        redirect: '/auth_code'
+        redirect_uri: redirectUri
+        response_type: req.query.response_type
 
 app.get '/auth_code', app.oauth.authCodeGrant (req, next) =>
   next null, true, req.params.uuid, null
 
 app.use app.oauth.errorHandler()
 
-app.listen PORT
+app.listen PORT, () =>
+  console.log 'Listening on port', PORT
