@@ -1,7 +1,13 @@
-FROM node:0.10-onbuild
+FROM node:5
+MAINTAINER Octoblu, Inc. <docker@octoblu.com>
 
 EXPOSE 80
 
-ENV PATH $PATH:/usr/local/bin
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-MAINTAINER Octoblu <docker@octoblu.com>
+COPY package.json /usr/src/app/
+RUN npm -s install --production
+COPY . /usr/src/app/
+
+CMD [ "node", "server.js" ]

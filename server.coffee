@@ -20,11 +20,11 @@ OAuth2Server.prototype.authCodeGrant = (check) ->
     new AuthCodeGrant that, req, res, next, check
 
 app = express()
+app.use meshbluHealthcheck()
 app.use cors()
 app.use morgan 'dev'
 app.use bodyParser.urlencoded extended: true
 app.use bodyParser.json()
-app.use meshbluHealthcheck()
 
 octobluOauth = new OctobluOauth meshbluConfig
 app.oauth = OAuth2Server
@@ -60,3 +60,7 @@ app.use app.oauth.errorHandler()
 
 app.listen PORT, () =>
   console.log 'Listening on port', PORT
+
+process.on 'SIGTERM', =>
+  console.log 'SIGTERM caught, exiting'
+  process.exit 0
