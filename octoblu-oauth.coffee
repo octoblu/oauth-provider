@@ -49,7 +49,7 @@ class OctobluOauth
     debug 'generateToken', options
     meshblu.generateAndStoreToken token[1], (error, response) =>
       debug 'generateAndStoreToken error: ', error if error?
-      callback error if error?
+      return callback error if error?
       newToken = response.token
       debug 'generateAndStoreToken', token[1], newToken
       meshblu.revokeToken token[1], token[2]

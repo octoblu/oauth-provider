@@ -39,8 +39,8 @@ app.get '/authorize', (req, res) ->
   clientId = req.query.client_id
   redirectUri = req.query.redirect_uri
   octobluOauth.getClient clientId, null, (error, client)=>
-    return response.status(500).send error: error if error?
-    return response.status(404).send error: 'Missing or undiscoverable client' unless client?
+    return res.status(500).send error: error if error?
+    return res.status(404).send error: 'Missing or undiscoverable client' unless client?
     redirectUri ?= client.redirectUri
     res.redirect url.format
       protocol: protocol
