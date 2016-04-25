@@ -42,6 +42,9 @@ class OctobluOauth
       debug 'sending authorization_code', btoa params.client_id + ':' + params.uuid + ':' + params.token
       return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
 
+    unless params.code?
+      params.code = btoa ":#{params.uuid}:#{params.token}"
+
     token = atob(params.code).split ':'
     debug 'generateToken, split', token
     options = _.extend({}, @meshbluOptions, uuid: token[1], token: token[2])
