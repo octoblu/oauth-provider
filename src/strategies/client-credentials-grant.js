@@ -204,7 +204,7 @@ function saveAuthCode (done) {
  */
 function redirect (done) {
   var uriObject = url.parse(this.client.redirectUri, true);
-  uriObject.query.token = this.authCode;
+  uriObject.query.access_token = this.authCode;
   debug('redirecting (req.query.state)', this.req.query.state);
   if (this.req.query.state){
     uriObject.query.state = this.req.query.state;
