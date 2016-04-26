@@ -1,27 +1,14 @@
-cors                   = require 'cors'
-morgan                 = require 'morgan'
-express                = require 'express'
-bodyParser             = require 'body-parser'
-errorHandler           = require 'errorhandler'
-meshbluHealthcheck     = require 'express-meshblu-healthcheck'
-MeshbluConfig          = require 'meshblu-config'
-debug                  = require('debug')('oauth-provider:server')
-Router                 = require './router'
-OauthProviderService   = require './services/oauth-provider-service'
-OAuth2Server           = require 'oauth2-server'
-OctobluOauth           = require './models/octoblu-oauth'
-AuthCodeGrant          = require './strategies/auth-code-grant'
-ClientCredentialsGrant = require './strategies/client-credentials-grant'
-
-OAuth2Server.prototype.authCodeGrant = (check) ->
-  that = @
-  (req, res, next) =>
-    new AuthCodeGrant that, req, res, next, check
-
-OAuth2Server.prototype.clientCredentialsGrant = (check) ->
-  that = @
-  (req, res, next) =>
-    new ClientCredentialsGrant that, req, res, next, check
+cors                 = require 'cors'
+morgan               = require 'morgan'
+express              = require 'express'
+bodyParser           = require 'body-parser'
+errorHandler         = require 'errorhandler'
+meshbluHealthcheck   = require 'express-meshblu-healthcheck'
+MeshbluConfig        = require 'meshblu-config'
+debug                = require('debug')('oauth-provider:server')
+OauthProviderService = require './services/oauth-provider-service'
+OAuthModel           = require './models/oauth'
+OAuthServer          = require 'express-oauth-server'
 
 class Server
   constructor: ({@disableLogging, @port, @octobluBaseUrl, @meshbluConfig})->
@@ -41,19 +28,11 @@ class Server
 
     app.options '*', cors()
 
-    octobluOauth = new OctobluOauth @meshbluConfig
-    app.oauth = OAuth2Server
-      model: octobluOauth
-      grants: [ 'authorization_code', 'client_credentials' ]
-      debug: true
-
-    app.use app.oauth.errorHandler()
+    model = new OAuthModel {@meshbluConfig}
+    oauth = new OAuthServer {model}
+    app.use oauth.authorize()
 
     oauthProviderService = new OauthProviderService
-    router = new Router {@meshbluConfig, oauthProviderService, @octobluBaseUrl, octobluOauth}
-
-    router.route app
-
     @server = app.listen @port, callback
 
   stop: (callback) =>
