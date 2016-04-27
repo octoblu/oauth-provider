@@ -1,4 +1,4 @@
-OctobluOauth = require '../octoblu-oauth'
+OctobluOauth = require '../src/models/octoblu-oauth'
 btoa = require 'btoa'
 
 describe 'OctobluOauth', ->
