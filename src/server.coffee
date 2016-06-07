@@ -24,7 +24,14 @@ OAuth2Server.prototype.clientCredentialsGrant = (check) ->
     new ClientCredentialsGrant that, req, res, next, check
 
 class Server
-  constructor: ({@disableLogging, @port, @octobluBaseUrl, @meshbluConfig})->
+  constructor: (options)->
+    {
+      @disableLogging
+      @port
+      @octobluBaseUrl
+      @meshbluConfig
+      @pepper
+    } = options
     @meshbluConfig ?= new MeshbluConfig().toJSON()
 
   address: =>
@@ -41,7 +48,7 @@ class Server
 
     app.options '*', cors()
 
-    octobluOauth = new OctobluOauth @meshbluConfig
+    octobluOauth = new OctobluOauth {@meshbluConfig, @pepper}
     app.oauth = OAuth2Server
       model: octobluOauth
       grants: [ 'authorization_code', 'client_credentials' ]

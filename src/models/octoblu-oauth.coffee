@@ -1,14 +1,20 @@
-btoa = require 'btoa'
-atob = require 'atob'
-_ = require 'lodash'
-debug = require('debug')('oauth-provider:octoblu-oauth')
+btoa   = require 'btoa'
+atob   = require 'atob'
+_      = require 'lodash'
+debug  = require('debug')('oauth-provider:octoblu-oauth')
+crypto = require 'crypto'
 
 class OctobluOauth
-  constructor: (@meshbluOptions={}, dependencies={}) ->
+  constructor: (options, dependencies={}) ->
+    {
+      @meshbluConfig
+      @pepper
+    } = options
+    @meshbluConfig ?= {}
     @MeshbluHttp = dependencies.MeshbluHttp ? require 'meshblu-http'
 
   getClient : (clientId, clientSecret, callback) =>
-    options = _.cloneDeep @meshbluOptions
+    options = _.clone @meshbluConfig
     if clientSecret
       options.uuid = clientId
       options.token = clientSecret
@@ -27,36 +33,50 @@ class OctobluOauth
     callback()
 
   getAuthCode: (authCode, callback) =>
-    token = atob(authCode).split ':'
-    debug 'getAuthCode', token
+    console.log atob(authCode)
+    [client_id, uuid, token] = atob(authCode).split ':'
+    debug 'getAuthCode', [client_id, uuid]
     callback null, {
-      clientId: token[0]
+      clientId: client_id
       expires: new Date() + 10000
-      userId: token[1]
+      userId: uuid
     }
+
+  _generateHash: ({client_id, uuid, token}) =>
+    hasher = crypto.createHash 'sha256'
+    console.log {client_id, uuid, @pepper}
+    hasher.update @meshbluConfig.uuid
+    hasher.update uuid
+    hasher.update @pepper
+    hasher.digest 'base64'
 
   generateToken: (type, req, callback) =>
     params = _.extend {}, req.query, req.body
     debug 'generateToken check type', type, params
     if type == 'authorization_code'
-      debug 'sending authorization_code', btoa params.client_id + ':' + params.uuid + ':' + params.token
-      return callback null, btoa params.client_id + ':' + params.uuid + ':' + params.token
+      responseToken = btoa [params.client_id, params.uuid, params.token].join ':'
+      debug 'sending authorization_code', responseToken
+      return callback null, responseToken
 
     unless params.code?
-      params.code = btoa ":#{params.uuid}:#{params.token}"
+      params.code = btoa "#{params.client_id}:#{params.uuid}:#{params.token}"
 
-    token = atob(params.code).split ':'
-    debug 'generateToken, split', token
-    options = _.extend({}, @meshbluOptions, uuid: token[1], token: token[2])
+    [client_id, uuid, token] = atob(params.code).split ':'
+    options = _.extend({}, @meshbluConfig, {uuid, token})
     meshblu = new @MeshbluHttp options
     debug 'generateToken', options
-    meshblu.generateAndStoreToken token[1], (error, response) =>
-      debug 'generateAndStoreToken error: ', error if error?
+    tag = @_generateHash {client_id, uuid, token}
+    tokenOptions = {tag, client_id}
+    meshblu.revokeTokenByQuery uuid, {tag}, (error, response) =>
       return callback error if error?
-      newToken = response.token
-      debug 'generateAndStoreToken', token[1], newToken
-      meshblu.revokeToken token[1], token[2]
-      callback null, btoa token[1] + ':' + newToken
+      console.log {response}
+      meshblu.generateAndStoreTokenWithOptions uuid, tokenOptions, (error, response) =>
+        debug 'generateAndStoreToken error: ', error if error?
+        return callback error if error?
+        newToken = response.token
+        debug 'generateAndStoreToken', uuid, newToken
+        meshblu.revokeToken uuid, token, (error) =>
+          callback null, btoa uuid + ':' + newToken
 
   saveAuthCode: (authCode, clientId, expires, user, callback) =>
     callback()

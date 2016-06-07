@@ -5,15 +5,16 @@ describe 'OctobluOauth', ->
   beforeEach ->
     @meshblu = generateAccessToken: sinon.stub()
     @MeshbluHttp = sinon.stub().returns @meshblu
+    @pepper = 'im-a-pepper'
 
-    @meshbluJSON =
+    @meshbluConfig =
       uuid: 'head'
       token: 'earth'
       server: 'https://meshblu.octoblu.com'
       port: 443
 
     @dependencies = MeshbluHttp: @MeshbluHttp
-    @sut = new OctobluOauth @meshbluJSON, @dependencies
+    @sut = new OctobluOauth {@meshbluConfig, @pepper}, @dependencies
 
   describe 'constructor', ->
     it 'should instantiate a OctobluOauth', ->
