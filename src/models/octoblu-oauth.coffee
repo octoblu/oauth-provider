@@ -33,7 +33,6 @@ class OctobluOauth
     callback()
 
   getAuthCode: (authCode, callback) =>
-    console.log atob(authCode)
     [client_id, uuid, token] = atob(authCode).split ':'
     debug 'getAuthCode', [client_id, uuid]
     callback null, {
@@ -44,7 +43,6 @@ class OctobluOauth
 
   _generateHash: ({client_id, uuid, token}) =>
     hasher = crypto.createHash 'sha256'
-    console.log {client_id, uuid, @pepper}
     hasher.update @meshbluConfig.uuid
     hasher.update uuid
     hasher.update @pepper
@@ -69,7 +67,6 @@ class OctobluOauth
     tokenOptions = {tag, client_id}
     meshblu.revokeTokenByQuery uuid, {tag}, (error, response) =>
       return callback error if error?
-      console.log {response}
       meshblu.generateAndStoreTokenWithOptions uuid, tokenOptions, (error, response) =>
         debug 'generateAndStoreToken error: ', error if error?
         return callback error if error?
