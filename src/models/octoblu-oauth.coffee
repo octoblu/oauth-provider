@@ -73,6 +73,7 @@ class OctobluOauth
         newToken = response.token
         debug 'generateAndStoreToken', uuid, newToken
         meshblu.revokeToken uuid, token, (error) =>
+          return callback error if error?
           callback null, btoa uuid + ':' + newToken
 
   saveAuthCode: (authCode, clientId, expires, user, callback) =>

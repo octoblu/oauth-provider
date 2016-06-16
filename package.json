@@ -1,6 +1,6 @@
 {
   "name": "octoblu-oauth-provider",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -13,6 +13,7 @@
     "errorhandler": "^1.4.3",
     "express": "^4.12.3",
     "express-meshblu-healthcheck": "^1.0.0",
+    "express-package-version": "0.0.2",
     "lodash": "^3.6.0",
     "meshblu-config": "^4.0.0",
     "meshblu-http": "^5.3.1",

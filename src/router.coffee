@@ -13,7 +13,7 @@ class Router
       clientId = req.query.client_id
       redirectUri = req.query.redirect_uri
       @octobluOauth.getClient clientId, null, (error, client)=>
-        return res.status(500).send error: error if error?
+        return res.status(error.code ? 500).send error: error.message if error?
         return res.status(404).send error: 'Missing or undiscoverable client' unless client?
         redirectUri ?= client.redirectUri
         authRedirectUri = '/auth_code'

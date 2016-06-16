@@ -12,6 +12,7 @@ OAuth2Server           = require 'oauth2-server'
 OctobluOauth           = require './models/octoblu-oauth'
 AuthCodeGrant          = require './strategies/auth-code-grant'
 ClientCredentialsGrant = require './strategies/client-credentials-grant'
+expressVersion         = require 'express-package-version'
 
 OAuth2Server.prototype.authCodeGrant = (check) ->
   that = @
@@ -39,10 +40,11 @@ class Server
 
   run: (callback) =>
     app = express()
+    app.use meshbluHealthcheck()
+    app.use expressVersion({format: '{"version": "%s"}'})
     app.use morgan 'dev', immediate: false unless @disableLogging
     app.use cors()
     app.use errorHandler()
-    app.use meshbluHealthcheck()
     app.use bodyParser.urlencoded limit: '1mb', extended : true
     app.use bodyParser.json limit : '1mb'
 
