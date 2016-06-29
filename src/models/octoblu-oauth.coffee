@@ -1,8 +1,10 @@
-btoa   = require 'btoa'
-atob   = require 'atob'
-_      = require 'lodash'
-debug  = require('debug')('oauth-provider:octoblu-oauth')
-crypto = require 'crypto'
+_          = require 'lodash'
+btoa       = require 'btoa'
+atob       = require 'atob'
+moment     = require 'moment'
+crypto     = require 'crypto'
+oauthError = require 'oauth2-server/lib/error'
+debug      = require('debug')('oauth-provider:octoblu-oauth')
 
 class OctobluOauth
   constructor: (options, dependencies={}) ->
@@ -14,6 +16,7 @@ class OctobluOauth
     @MeshbluHttp = dependencies.MeshbluHttp ? require 'meshblu-http'
 
   getClient : (clientId, clientSecret, callback) =>
+    return callback oauthError('invalid_client', 'Missing clientId') unless clientId?
     options = _.clone @meshbluConfig
     if clientSecret
       options.uuid = clientId
@@ -22,23 +25,38 @@ class OctobluOauth
     meshblu = new @MeshbluHttp options
     debug 'getClient: about to get device', clientId, clientSecret
     meshblu.device clientId, (error, device) =>
-      return callback error if error?
+      return callback oauthError('invalid_client', 'Unable to get Client') if error?
+      return callback oauthError('invalid_client', 'Client Not Found') unless device?
       debug 'getClient found device', device?.uuid
-      callback null, client_id: clientId, client_secret: clientSecret, redirectUri: device.options?.callbackUrl
+      callback null, {
+        clientId,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirectUri: device.options?.callbackUrl
+      }
 
   grantTypeAllowed : (clientId, grantType, callback) =>
-    callback(null, true)
+    allowed = grantType in [ 'refresh_token', 'authorization_code', 'client_credentials' ]
+    callback null, allowed
 
   saveAccessToken : (accessToken, clientId, expires, userId, callback) =>
     callback()
 
-  getAuthCode: (authCode, callback) =>
-    [client_id, uuid, token] = atob(authCode).split ':'
-    debug 'getAuthCode', [client_id, uuid]
+  getAccessToken: (bearerToken, callback) =>
+    [userId, token] = atob(bearerToken).split ':'
+    debug 'getAccessToken', {userId}
     callback null, {
-      clientId: client_id
-      expires: new Date() + 10000
-      userId: uuid
+      expires: null
+      userId
+    }
+
+  getAuthCode: (authCode, callback) =>
+    [clientId, userId, token] = atob(authCode).split ':'
+    debug 'getAuthCode', {clientId, userId}
+    callback null, {
+      clientId: clientId
+      expires: moment().add(1, 'year').unix()
+      userId
     }
 
   _generateHash: ({client_id, uuid, token}) =>
@@ -63,20 +81,30 @@ class OctobluOauth
     options = _.extend({}, @meshbluConfig, {uuid, token})
     meshblu = new @MeshbluHttp options
     debug 'generateToken', options
-    tag = @_generateHash {client_id, uuid, token}
-    tokenOptions = {tag, client_id}
-    meshblu.revokeTokenByQuery uuid, {tag}, (error, response) =>
-      return callback error if error?
-      meshblu.generateAndStoreTokenWithOptions uuid, tokenOptions, (error, response) =>
-        debug 'generateAndStoreToken error: ', error if error?
-        return callback error if error?
-        newToken = response.token
-        debug 'generateAndStoreToken', uuid, newToken
-        meshblu.revokeToken uuid, token, (error) =>
-          return callback error if error?
-          callback null, btoa uuid + ':' + newToken
+    meshblu.generateAndStoreToken uuid, (error, response) =>
+      debug 'generateAndStoreToken error: ', error if error?
+      return callback oauthError('invalid_token', error) if error?
+      newToken = response.token
+      debug 'generateAndStoreToken', uuid
+      meshblu.revokeToken uuid, token, (error) =>
+        callback null, btoa uuid + ':' + newToken
 
   saveAuthCode: (authCode, clientId, expires, user, callback) =>
+    callback()
+
+  saveRefreshToken: (refreshToken, clientId, expires, user, callback) =>
+    callback()
+
+  getRefreshToken: (refreshToken, callback) =>
+    [clientId, userId, token] = atob(refreshToken).split ':'
+    debug 'getRefreshToken', {clientId, userId}
+    callback null, {
+      clientId,
+      expires: null
+      userId
+    }
+
+  revokeRefreshToken: (refreshToken, callback) =>
     callback()
 
 module.exports = OctobluOauth

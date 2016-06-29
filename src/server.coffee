@@ -9,6 +9,7 @@ debug                  = require('debug')('oauth-provider:server')
 Router                 = require './router'
 OauthProviderService   = require './services/oauth-provider-service'
 OAuth2Server           = require 'oauth2-server'
+moment                 = require 'moment'
 OctobluOauth           = require './models/octoblu-oauth'
 AuthCodeGrant          = require './strategies/auth-code-grant'
 ClientCredentialsGrant = require './strategies/client-credentials-grant'
@@ -44,7 +45,6 @@ class Server
     app.use expressVersion({format: '{"version": "%s"}'})
     app.use morgan 'dev', immediate: false unless @disableLogging
     app.use cors()
-    app.use errorHandler()
     app.use bodyParser.urlencoded limit: '1mb', extended : true
     app.use bodyParser.json limit : '1mb'
 
@@ -53,15 +53,18 @@ class Server
     octobluOauth = new OctobluOauth {@meshbluConfig, @pepper}
     app.oauth = OAuth2Server
       model: octobluOauth
-      grants: [ 'authorization_code', 'client_credentials' ]
+      grants: [ 'refresh_token', 'authorization_code', 'client_credentials' ]
       debug: true
-
-    app.use app.oauth.errorHandler()
+      accessTokenLifetime: null
+      refreshTokenLifetime: null
+      authCodeLifetime: moment().add(1, 'day').unix()
 
     oauthProviderService = new OauthProviderService
     router = new Router {@meshbluConfig, oauthProviderService, @octobluBaseUrl, octobluOauth}
 
     router.route app
+
+    app.use app.oauth.errorHandler()
 
     @server = app.listen @port, callback
 
