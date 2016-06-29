@@ -51,13 +51,14 @@ class Server
     app.options '*', cors()
 
     octobluOauth = new OctobluOauth {@meshbluConfig, @pepper}
+
     app.oauth = OAuth2Server
       model: octobluOauth
       grants: [ 'refresh_token', 'authorization_code', 'client_credentials' ]
       debug: true
       accessTokenLifetime: null
       refreshTokenLifetime: null
-      authCodeLifetime: moment().add(1, 'day').unix()
+      authCodeLifetime: moment().add(1, 'year').unix()
 
     oauthProviderService = new OauthProviderService
     router = new Router {@meshbluConfig, oauthProviderService, @octobluBaseUrl, octobluOauth}

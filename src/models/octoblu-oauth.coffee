@@ -19,8 +19,11 @@ class OctobluOauth
     return callback oauthError('invalid_client', 'Missing clientId') unless clientId?
     options = _.clone @meshbluConfig
     if clientSecret
+      debug 'using client creds'
       options.uuid = clientId
       options.token = clientSecret
+    else
+      debug 'using oauth-provider creds'
 
     meshblu = new @MeshbluHttp options
     debug 'getClient: about to get device', clientId, clientSecret
@@ -54,12 +57,12 @@ class OctobluOauth
     [clientId, userId, token] = atob(authCode).split ':'
     debug 'getAuthCode', {clientId, userId}
     callback null, {
-      clientId: clientId
-      expires: moment().add(1, 'year').unix()
+      clientId,
+      expires: moment().add(1, 'year').valueOf()
       userId
     }
 
-  _generateHash: ({client_id, uuid, token}) =>
+  _generateHash: ({client_id, uuid, token }) =>
     hasher = crypto.createHash 'sha256'
     hasher.update @meshbluConfig.uuid
     hasher.update uuid
@@ -69,6 +72,7 @@ class OctobluOauth
   generateToken: (type, req, callback) =>
     params = _.extend {}, req.query, req.body
     debug 'generateToken check type', type, params
+
     if type == 'authorization_code'
       responseToken = btoa [params.client_id, params.uuid, params.token].join ':'
       debug 'sending authorization_code', responseToken
@@ -78,16 +82,22 @@ class OctobluOauth
       params.code = btoa "#{params.client_id}:#{params.uuid}:#{params.token}"
 
     [client_id, uuid, token] = atob(params.code).split ':'
+    return callback null, btoa uuid + ':' + token if type == 'refreshToken'
+    debug {client_id, uuid, token}
     options = _.extend({}, @meshbluConfig, {uuid, token})
     meshblu = new @MeshbluHttp options
-    debug 'generateToken', options
-    meshblu.generateAndStoreToken uuid, (error, response) =>
-      debug 'generateAndStoreToken error: ', error if error?
-      return callback oauthError('invalid_token', error) if error?
-      newToken = response.token
-      debug 'generateAndStoreToken', uuid
-      meshblu.revokeToken uuid, token, (error) =>
-        callback null, btoa uuid + ':' + newToken
+    tag = @_generateHash {client_id, uuid, token}
+    tokenOptions = {tag, client_id}
+    meshblu.revokeTokenByQuery uuid, {tag}, (error, response) =>
+      return callback oauthError 'server_error', error if error?
+      meshblu.generateAndStoreTokenWithOptions uuid, tokenOptions, (error, response) =>
+        debug 'generateAndStoreToken error: ', error if error?
+        return callback oauthError 'server_error', error if error?
+        newToken = response.token
+        debug 'generateAndStoreToken', uuid, newToken
+        meshblu.revokeToken uuid, token, (error) =>
+          return callback oauthError 'server_error', error if error?
+          callback null, btoa uuid + ':' + newToken
 
   saveAuthCode: (authCode, clientId, expires, user, callback) =>
     callback()

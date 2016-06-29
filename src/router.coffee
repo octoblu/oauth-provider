@@ -1,8 +1,21 @@
 URL                     = require 'url'
+debug                   = require('debug')('oauth-provider:router')
 OauthProviderController = require './controllers/oauth-provider-controller'
 
 class Router
   constructor: ({@oauthProviderService, @octobluBaseUrl, @octobluOauth}) ->
+
+  debugExpress: (req, res, next) =>
+    debug 'method', req.method
+    debug 'body', req.body
+    debug 'headers', req.headers
+    debug 'query', req.query
+    debug 'params', req.params
+    next()
+
+  check: (req, next) =>
+    next null, true, true
+
   route: (app) =>
     oauthProviderController = new OauthProviderController {@oauthProviderService}
 
@@ -19,7 +32,7 @@ class Router
         authRedirectUri = '/auth_code'
         if req.query.response_type == 'token'
           authRedirectUri = '/client_token'
-        res.redirect URL.format
+        redirect = URL.format
           protocol: protocol
           hostname: hostname
           port: port
@@ -29,6 +42,8 @@ class Router
             redirect: authRedirectUri
             redirect_uri: redirectUri
             response_type: req.query.response_type
+        debug 'redirecting to ', redirect
+        res.redirect redirect
 
     app.get '/auth_code', app.oauth.authCodeGrant (req, next) =>
       next null, true, req.params.uuid, null
