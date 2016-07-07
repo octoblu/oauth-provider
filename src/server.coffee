@@ -7,7 +7,6 @@ meshbluHealthcheck     = require 'express-meshblu-healthcheck'
 MeshbluConfig          = require 'meshblu-config'
 debug                  = require('debug')('oauth-provider:server')
 Router                 = require './router'
-OauthProviderService   = require './services/oauth-provider-service'
 OAuth2Server           = require 'oauth2-server'
 moment                 = require 'moment'
 OctobluOauth           = require './models/octoblu-oauth'
@@ -60,8 +59,7 @@ class Server
       refreshTokenLifetime: null
       authCodeLifetime: moment().add(1, 'year').unix()
 
-    oauthProviderService = new OauthProviderService
-    router = new Router {@meshbluConfig, oauthProviderService, @octobluBaseUrl, octobluOauth}
+    router = new Router {@meshbluConfig, @octobluBaseUrl, octobluOauth}
 
     router.route app
 
