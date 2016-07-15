@@ -1,6 +1,6 @@
 {
   "name": "octoblu-oauth-provider",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -20,6 +20,7 @@
     "moment": "^2.13.0",
     "morgan": "^1.7.0",
     "oauth2-server": "^2.4.0",
+    "raven": "^0.11.0",
     "request": "^2.72.0"
   },
   "devDependencies": {

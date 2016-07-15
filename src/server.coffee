@@ -1,4 +1,5 @@
 cors                   = require 'cors'
+raven                  = require 'raven'
 morgan                 = require 'morgan'
 express                = require 'express'
 bodyParser             = require 'body-parser'
@@ -32,6 +33,7 @@ class Server
       @octobluBaseUrl
       @meshbluConfig
       @pepper
+      @sentryDSN
     } = options
     @meshbluConfig ?= new MeshbluConfig().toJSON()
 
@@ -40,6 +42,9 @@ class Server
 
   run: (callback) =>
     app = express()
+
+    app.use raven.middleware.express.requestHandler @sentryDSN if @sentryDSN
+    app.use raven.middleware.express.errorHandler @sentryDSN if @sentryDSN
     app.use meshbluHealthcheck()
     app.use expressVersion({format: '{"version": "%s"}'})
     app.use morgan 'dev', immediate: false unless @disableLogging

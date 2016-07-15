@@ -10,6 +10,7 @@ class Command
       octobluBaseUrl: process.env.OCTOBLU_BASE_URL ? 'https://app.octoblu.com'
       meshbluConfig:  new MeshbluConfig().toJSON()
       pepper:         process.env.PEPPER
+      sentryDSN:     process.env.SENTRY_DSN
 
   panic: (error) =>
     console.error error.stack
