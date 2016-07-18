@@ -1,9 +1,9 @@
 cors                   = require 'cors'
-raven                  = require 'raven'
 morgan                 = require 'morgan'
 express                = require 'express'
 bodyParser             = require 'body-parser'
 errorHandler           = require 'errorhandler'
+OctobluRaven           = require 'octoblu-raven'
 meshbluHealthcheck     = require 'express-meshblu-healthcheck'
 MeshbluConfig          = require 'meshblu-config'
 debug                  = require('debug')('oauth-provider:server')
@@ -33,8 +33,9 @@ class Server
       @octobluBaseUrl
       @meshbluConfig
       @pepper
-      @sentryDSN
+      @octobluRaven
     } = options
+    @octobluRaven ?= new OctobluRaven()
     @meshbluConfig ?= new MeshbluConfig().toJSON()
 
   address: =>
@@ -43,8 +44,10 @@ class Server
   run: (callback) =>
     app = express()
 
-    app.use raven.middleware.express.requestHandler @sentryDSN if @sentryDSN
-    app.use raven.middleware.express.errorHandler @sentryDSN if @sentryDSN
+    ravenExpress = @octobluRaven.express()
+    app.use ravenExpress.requestHandler()
+    app.use ravenExpress.errorHandler()
+    app.use ravenExpress.sendError()
     app.use meshbluHealthcheck()
     app.use expressVersion({format: '{"version": "%s"}'})
     app.use morgan 'dev', immediate: false unless @disableLogging
