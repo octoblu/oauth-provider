@@ -5,16 +5,17 @@ Server        = require './src/server'
 
 class Command
   constructor: ->
+    @octobluRaven = new OctobluRaven()
     @serverOptions =
       port:           process.env.PORT || 80
       disableLogging: process.env.DISABLE_LOGGING == 'true'
       octobluBaseUrl: process.env.OCTOBLU_BASE_URL ? 'https://app.octoblu.com'
       meshbluConfig:  new MeshbluConfig().toJSON()
       pepper:         process.env.PEPPER
-      octobluRaven:   new OctobluRaven()
+      octobluRaven:   @octobluRaven
 
-  handleErrors: =>
-    @serverOptions.octobluRaven.worker().handleErrors()
+  catchErrors: =>
+    @octobluRaven.patchGlobal()
 
   panic: (error) =>
     console.error error.stack
@@ -32,5 +33,5 @@ class Command
       console.log "Server listening on #{address}:#{port}"
 
 command = new Command()
-command.handleErrors()
+command.catchErrors()
 command.run()
