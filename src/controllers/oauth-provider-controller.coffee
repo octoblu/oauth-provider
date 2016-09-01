@@ -37,6 +37,7 @@ class OauthProviderController
         protocol: protocol
         hostname: hostname
         port: port
+        slashes: true
         pathname: "/oauth/#{clientId}"
         query:
           state: state
