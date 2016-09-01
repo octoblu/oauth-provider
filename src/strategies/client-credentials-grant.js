@@ -19,6 +19,7 @@ var error = require('oauth2-server/lib/error'),
   runner = require('oauth2-server/lib/runner'),
   token = require('oauth2-server/lib/token'),
   url  = require('url'),
+  querystring = require('querystring'),
   _ = require('lodash');
 
 module.exports = AuthCodeGrant;
@@ -205,11 +206,13 @@ function saveAuthCode (done) {
 function redirect (done) {
   var uriObject = url.parse(this.client.redirectUri, true);
   uriObject.query.access_token = this.authCode;
+  uriObject.query.token_type = 'bearer';
   debug('redirecting (req.query.state)', this.req.query.state);
   if (this.req.query.state){
     uriObject.query.state = this.req.query.state;
   }
-  var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query', 'slashes'));
+  uriObject.hash = querystring.stringify(uriObject.query);
+  var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query', 'slashes', 'hash'));
   debug('Redirecting to URI', uri, uriObject);
   this.res.redirect(uri);
 
