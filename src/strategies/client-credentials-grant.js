@@ -209,7 +209,7 @@ function redirect (done) {
   if (this.req.query.state){
     uriObject.query.state = this.req.query.state;
   }
-  var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query'));
+  var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query', 'slashes'));
   debug('Redirecting to URI', uri, uriObject);
   this.res.redirect(uri);
 
