@@ -211,7 +211,7 @@ function redirect (done) {
   if (this.req.query.state){
     uriObject.query.state = this.req.query.state;
   }
-  uriObject.hash = querystring.stringify(uriObject.query);
+  uriObject.hash = querystring.stringify(uriObject.query, encodeURIComponent: uri => uri);
   var uri = url.format(_.pick(uriObject, 'protocol', 'hostname', 'port', 'pathname', 'query', 'slashes', 'hash'));
   debug('Redirecting to URI', uri, uriObject);
   this.res.redirect(uri);
