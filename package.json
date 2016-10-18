@@ -1,6 +1,6 @@
 {
-  "name": "octoblu-oauth-provider",
-  "version": "2.7.5",
+  "name": "oauth-provider",
+  "version": "2.7.6",
   "description": "",
   "main": "index.js",
   "dependencies": {
