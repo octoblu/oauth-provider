@@ -1,6 +1,6 @@
 {
   "name": "octoblu-oauth-provider",
-  "version": "2.7.3",
+  "version": "2.7.4",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -29,11 +29,17 @@
     "coffee-script": "^1.9.1",
     "mocha": "^2.5.3",
     "sinon": "^1.17.4",
-    "sinon-chai": "^2.7.0"
+    "sinon-chai": "^2.7.0",
+    "nyc": "^8.3.0",
+    "mocha-osx-reporter": "^0.1.2",
+    "mocha-multi": "^0.9.1"
   },
   "scripts": {
     "start": "node command.js",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc npm test",
+    "mocha:json": "env NPM_ENV=test mocha --reporter json > coverage/mocha.json",
+    "test:watch": "mocha -w -R mocha-multi --reporter-options spec=-,mocha-osx-reporter=-"
   },
   "repository": {
     "type": "git",
