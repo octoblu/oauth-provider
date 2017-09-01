@@ -11,6 +11,7 @@ class OauthProviderController
     responseType = req.query.response_type
     @_getRedirectUri {clientId, redirectUri, responseType, state}, (error, uri) =>
       return res.status(error.code ? 500).send error: error.message if error?
+      return res.status(500).send error: "Redirect URI is invalid" unless uri?
       debug 'redirecting to ', { uri }
       res.redirect uri
 
